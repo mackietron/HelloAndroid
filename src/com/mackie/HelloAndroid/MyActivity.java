@@ -1,8 +1,8 @@
 package com.mackie.HelloAndroid;
 
 import android.app.Activity;
+import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -69,10 +69,10 @@ public class MyActivity extends Activity {
             inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
         }
 
-        return inSampleSize;                                                                                                 11
+        return inSampleSize;
     }
 
-    Bitmap decodeSampledBitmapFromResource(Resources res, int resId, int reqWidth, int reqHeight) {
+    /*Bitmap decodeSampledBitmapFromResource(Resources res, int resId, int reqWidth, int reqHeight) {
 
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -85,7 +85,7 @@ public class MyActivity extends Activity {
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeResource(res, resId, options);
-    }
+    }*/
 
     Bitmap decodeSampledBitmapFromUri(Uri uri, int reqWidth, int reqHeight) {
         File image = new File(getRealPathFromURI(uri));
@@ -104,12 +104,15 @@ public class MyActivity extends Activity {
         return BitmapFactory.decodeFile(image.getPath(), options);
     }
 
-    String getRealPathFromURI(Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        Cursor cursor = managedQuery(contentUri, proj, null, null, null);
+
+    private String getRealPathFromURI(Uri contentUri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        // import android.support.v4.content.CursorLoader; i import this for CursorLoader
+        CursorLoader loader = new CursorLoader(getApplicationContext(), contentUri,
+                                               projection, null, null, null);
+        Cursor cursor = loader.loadInBackground();
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         return cursor.getString(column_index);
     }
-
 }
